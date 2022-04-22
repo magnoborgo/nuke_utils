@@ -1,0 +1,133 @@
+#! /Applications/Nuke12.2v5/Nuke12.2v5.app/Contents/MacOS/libnuke-12.2.5.dylib -nx
+version 12.2 v5
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="23" w="2048" h="1107" maximized="1" screen="0">
+        <splitter orientation="1">
+            <split size="1295"/>
+            <splitter orientation="1">
+                <split size="40"/>
+                <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                    <page id="Toolbar.1"/>
+                </dock>
+                <split size="1251"/>
+                <splitter orientation="2">
+                    <split size="1091"/>
+                    <dock id="" activePageId="Viewer.1">
+                        <page id="Viewer.1"/>
+                    </dock>
+                </splitter>
+            </splitter>
+            <split size="749"/>
+            <splitter orientation="2">
+                <split size="544"/>
+                <dock id="" activePageId="DAG.1" focus="true">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                    <page id="uk.co.thefoundry.scripteditor.1"/>
+                </dock>
+                <split size="543"/>
+                <dock id="" activePageId="Properties.1">
+                    <page id="Properties.1"/>
+                </dock>
+            </splitter>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /Users/mb/.nuke/ToolSets/pyramid.nk
+ colorManagement Nuke
+ workingSpaceLUT linear
+ monitorLut sRGB
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+}
+Dot {
+ inputs 0
+ name Dot6
+ note_font_size 30
+ selected true
+ xpos -54
+ ypos 794
+}
+set N22e1fc00 [stack 0]
+Dot {
+ name Dot17
+ note_font_size 30
+ selected true
+ xpos 161
+ ypos 794
+}
+Group {
+ name LP
+ label "level \[value level]"
+ selected true
+ xpos 127
+ ypos 870
+ addUserKnob {20 User l LP}
+ addUserKnob {7 basesize l "base level size" t "level 1 base size" R 0 1000}
+ basesize 3.75
+ addUserKnob {7 level t "pyramid depth" R 0 100}
+ level 1
+ addUserKnob {7 multiplier t "depth multiplier" R 0 1000}
+ multiplier 2
+ addUserKnob {26 ""}
+ addUserKnob {20 About}
+ addUserKnob {26 txt l "" +STARTLINE T "Frequency Separation / Laplacian Pyramid inspired Toolset by Magno Borgo"}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos 349
+  ypos -156
+ }
+ Laplacian {
+  size {{parent.basesize*multiplier*level}}
+  name Laplacian5
+  xpos 349
+  ypos -88
+ }
+ Output {
+  name Output1
+  xpos 349
+  ypos -16
+ }
+end_group
+set N22e1b900 [stack 0]
+Dot {
+ name Dot7
+ note_font_size 30
+ selected true
+ xpos 161
+ ypos 921
+}
+Dot {
+ name Dot18
+ note_font_size 30
+ selected true
+ xpos 161
+ ypos 1036
+}
+push $N22e1fc00
+push $N22e1b900
+Merge2 {
+ inputs 2
+ operation minus
+ name Merge5
+ selected true
+ xpos -88
+ ypos 874
+}
+Merge2 {
+ inputs 2
+ operation plus
+ name Plus1
+ selected true
+ xpos -88
+ ypos 1033
+}
