@@ -1,6 +1,6 @@
 ## Nuke Utils
 
-Nuke Utils is a collection of scripts/gizmos that I developed for my day to day compositing using Nuke
+Nuke Utils is a collection of scripts/gizmos/toolsets that I developed (or adapted/modified) for my day to day compositing using Nuke
 
 ### Brief descriptions
 
