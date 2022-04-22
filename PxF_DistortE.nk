@@ -1,0 +1,323 @@
+set cut_paste_input [stack 0]
+version 9.0 v7
+push $cut_paste_input
+Group {
+ name PxF_DistortE
+ knobChanged "\nif nuke.thisKnob().name() == 'wrap':\n    with nuke.thisGroup():\n        node = nuke.toNode('Copy1')\n        if nuke.thisKnob().value():\n            node.setInput(0, nuke.toNode('Transform1'))\n        else:\n            node.setInput(0, nuke.toNode('Dot3'))\n"
+ selected true
+ xpos -602
+ ypos -577
+ addUserKnob {20 User}
+ addUserKnob {6 unmult l Unpremult/premult +STARTLINE}
+ addUserKnob {1 _klass l INVISIBLE +INVISIBLE}
+ _klass PxF_Distort2
+ addUserKnob {41 channels T IDistort1.channels}
+ addUserKnob {7 amount R -2 2}
+ amount 0.08
+ addUserKnob {6 fine +STARTLINE}
+ fine true
+ addUserKnob {7 blurLens R 0 100}
+ blurLens 6
+ addUserKnob {7 EdgeBlur R 0 100}
+ EdgeBlur 10
+ addUserKnob {7 EdgeDilate l edgeErode R -30 30}
+ addUserKnob {6 wrap +STARTLINE}
+ addUserKnob {4 lensChannel M {red green blue alpha}}
+ lensChannel alpha
+ addUserKnob {41 filter T IDistort1.filter}
+ addUserKnob {26 ""}
+ addUserKnob {26 t l "" +STARTLINE T "PxF_Distort 2.0.2 - (c) 2012 - Xavier Bourque - www.pixelfudger.com\nmodified to avoid crash since nuke7 when viewing an upstream roto\nand added mask edge formula by Simon Jaques/Magno Borgo"}
+}
+ Input {
+  inputs 0
+  name mask
+  xpos 147
+  ypos 411
+  number 2
+ }
+ Input {
+  inputs 0
+  name img
+  xpos -121
+  ypos -613
+ }
+ Unpremult {
+  name Unpremult1
+  xpos -121
+  ypos -557
+  disable {{!unmult}}
+ }
+ Dot {
+  name Dot3
+  xpos -87
+  ypos -503
+ }
+set N5700da80 [stack 0]
+ Dot {
+  name Dot2
+  xpos -435
+  ypos -121
+ }
+set N5700de20 [stack 0]
+ Input {
+  inputs 0
+  name lens
+  xpos 431
+  ypos -608
+  number 1
+ }
+ Dot {
+  name Dot4
+  xpos 465
+  ypos -538
+ }
+set N408bc240 [stack 0]
+ Shuffle {
+  red black
+  green black
+  blue black
+  name Shuffle4
+  label alpha
+  xpos 568
+  ypos -401
+ }
+push $N408bc240
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha blue
+  name Shuffle3
+  label blue
+  xpos 475
+  ypos -399
+ }
+push $N408bc240
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha green
+  name Shuffle2
+  label green
+  xpos 386
+  ypos -401
+ }
+push $N408bc240
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha red
+  name Shuffle1
+  label red
+  xpos 293
+  ypos -403
+ }
+ Switch {
+  inputs 4
+  which {{lensChannel i}}
+  name Switch1
+  xpos 429
+  ypos -334
+ }
+ Dot {
+  name Dot1
+  xpos 457
+  ypos -245
+ }
+set N408da7e0 [stack 0]
+push $N408da7e0
+ Position {
+  translate {1 0}
+  name Position1
+  xpos 342
+  ypos -209
+ }
+ Merge2 {
+  inputs 2
+  operation minus
+  name Merge15
+  xpos 403
+  ypos -167
+ }
+push $N408da7e0
+push $N408da7e0
+ Position {
+  translate {0 1}
+  name Position2
+  xpos 556
+  ypos -219
+ }
+ Merge2 {
+  inputs 2
+  operation minus
+  name Merge21
+  xpos 508
+  ypos -174
+ }
+ ShuffleCopy {
+  inputs 2
+  red alpha
+  green alpha2
+  blue blue
+  name ShuffleCopy3
+  xpos 439
+  ypos -116
+ }
+ Blur {
+  size {{"blurLens * width / 2048 * 2.75" x1 30}}
+  name Blur13
+  xpos 439
+  ypos -90
+ }
+ Multiply {
+  value {{"fine ? pow(blurLens,0.395) * amount * width * 3.597 / 10 : pow(blurLens,0.395) * amount * width * 3.597" i}}
+  name Multiply5
+  xpos 439
+  ypos -43
+ }
+set N610eda60 [stack 0]
+ Expression {
+  channel3 {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  expr3 "r == 0 && g == 0 ? 1 : 0"
+  name Expression1
+  xpos 431
+  ypos 292
+ }
+push $N5700de20
+ Input {
+  inputs 0
+  name mask_edge
+  xpos 39
+  ypos -279
+  number 3
+ }
+ Blur {
+  channels alpha
+  size {{EdgeBlur}}
+  name Blur50
+  xpos 28
+  ypos -178
+ }
+ Dilate {
+  channels alpha
+  size {{EdgeDilate}}
+  name Dilate1
+  selected true
+  xpos 28
+  ypos -140
+ }
+push $N408da7e0
+ Dot {
+  name Dot5
+  xpos 172
+  ypos -245
+ }
+push $N610eda60
+ Keymix {
+  inputs 3
+  name Keymix3
+  xpos 141
+  ypos -43
+ }
+push $N5700da80
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy1
+  xpos -121
+  ypos -49
+ }
+ IDistort {
+  channels rgb
+  uv forward
+  blur -depth.Z
+  name IDistort1
+  xpos -121
+  ypos 76
+ }
+ Remove {
+  channels forward
+  name Remove1
+  xpos -113
+  ypos 143
+ }
+ Keymix {
+  inputs 3
+  name Keymix1
+  xpos -113
+  ypos 286
+ }
+ Keymix {
+  inputs 3
+  invertMask true
+  bbox B
+  name Keymix2
+  xpos -113
+  ypos 405
+  disable {{"\[exists parent.input2] ? 0 : 1" x1 0}}
+ }
+ Premult {
+  name Premult1
+  xpos -113
+  ypos 490
+  disable {{!unmult}}
+ }
+ Output {
+  name Output1
+  xpos -113
+  ypos 583
+ }
+push $N5700da80
+ Mirror {
+  Horizontal true
+  Vertical true
+  name Mirror2
+  xpos -270
+  ypos -263
+  disable {{"1 - wrap" i}}
+ }
+ Reformat {
+  type scale
+  scale 3
+  filter Impulse
+  name Reformat2
+  xpos -270
+  ypos -236
+  disable {{"1 - wrap" i}}
+ }
+ Tile {
+  rows 3
+  mirrorRows true
+  columns 3
+  mirrorCols true
+  filter Impulse
+  name Tile1
+  xpos -270
+  ypos -212
+  disable {{"1 - wrap" i}}
+ }
+ Reformat {
+  type scale
+  scale 0.333333
+  resize none
+  filter Impulse
+  name Reformat3
+  xpos -270
+  ypos -188
+  disable {{"1 - wrap" i}}
+ }
+ Transform {
+  translate {-1 -1}
+  center {3072 2334}
+  black_outside false
+  name Transform1
+  xpos -270
+  ypos -154
+  disable {{"1 - wrap"}}
+ }
+end_group
