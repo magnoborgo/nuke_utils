@@ -5,7 +5,7 @@ Nuke Utils is a collection of scripts/gizmos/toolsets that I developed (or adapt
 ### Brief descriptions
 
 **Pxf_distortE** - the great Pxf_distort with an additional input to protect the core portion of the image<br> 
-**pyramid** - Frequency separation toolset
+**pyramid** - Frequency separation toolset<br>
 **tracker_to_bbox** - Converts 4 trackers to a Crop or CurveTool node 
 
 
