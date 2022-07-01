@@ -1,0 +1,20 @@
+set cut_paste_input [stack 0]
+version 12.2 v5
+push $cut_paste_input
+FrameRange {
+ first_frame 1001
+ last_frame 1024
+ time ""
+ name FrameRange5
+ selected true
+ xpos 1060
+ ypos 87
+}
+Switch {
+ which {{"! (x >= \[value this.input0.first_frame] && x <= \[value this.input0.last_frame] )"}}
+ name Switch2
+ label "framerange autoswitch "
+ selected true
+ xpos 1060
+ ypos 133
+}

@@ -1,0 +1,342 @@
+set cut_paste_input [stack 0]
+version 8.0 v5
+push $cut_paste_input
+Group {
+ name rm_healPatch3
+ selected true
+ xpos 6660
+ ypos 465
+ addUserKnob {20 User}
+ addUserKnob {26 Rectangle l "Patch coords:"}
+ addUserKnob {12 LL l "Left Lower"}
+ LL {2455.199951 571}
+ addUserKnob {12 RL l "Right Lower"}
+ RL {2501.800049 570}
+ addUserKnob {12 LU l "Left Upper"}
+ LU {2454.399902 623}
+ addUserKnob {12 RU l "Right Upper"}
+ RU {2503.399902 622}
+ addUserKnob {26 ""}
+ addUserKnob {7 edgeblur l "Edge Softness" R 0 20}
+ addUserKnob {26 Blur l Blur:}
+ addUserKnob {7 lblur l Left R 0 50}
+ addUserKnob {7 rblur l Right R 0 50}
+ addUserKnob {7 ublur l Upper R 0 50}
+ addUserKnob {7 lowblur l Lower R 0 50}
+ addUserKnob {26 enable l Enable:}
+ addUserKnob {6 enableUpper l Upper +STARTLINE}
+ enableUpper true
+ addUserKnob {6 enableLeft l Left +STARTLINE}
+ enableLeft true
+ addUserKnob {6 enableRight l Right -STARTLINE}
+ enableRight true
+ addUserKnob {6 enableLower l Lower +STARTLINE}
+ enableLower true
+ addUserKnob {26 ""}
+ addUserKnob {7 hvratio l "H-V Mix" t "Mix ratio of Horizontal and Vertical Interpolation\n0 - only horizontal\n1 - only vertical\n0.5 - average"}
+ hvratio 1
+ addUserKnob {41 operation l "H-V Operation" T Merge7.operation}
+}
+ Constant {
+  inputs 0
+  channels rgb
+  name Constant1
+  xpos 409
+  ypos -98
+ }
+set N194bfa10 [stack 0]
+ Dot {
+  name Dot6
+  xpos 314
+  ypos -71
+ }
+ Ramp {
+  p0 {{parent.CornerPin2D1.to2.x} {parent.CornerPin2D1.to1.y}}
+  p1 {{parent.CornerPin2D1.to1.x} {parent.CornerPin2D1.to1.y}}
+  name Ramp1
+  xpos -1
+  ypos -74
+ }
+ Dot {
+  name Dot8
+  xpos 32
+  ypos -6
+ }
+ Input {
+  inputs 0
+  name Input1
+  xpos 407
+  ypos -255
+ }
+ CornerPin2D {
+  to1 {{min(from1,from2,from3,from4)} {min(from1,from2,from3,from4)}}
+  to2 {{max(from1,from2,from3,from4)} {min(from1,from2,from3,from4)}}
+  to3 {{max(from1,from2,from3,from4)} {max(from1,from2,from3,from4)}}
+  to4 {{min(from1,from2,from3,from4)} {max(from1,from2,from3,from4)}}
+  invert false
+  from1 {{parent.LL} {parent.LL}}
+  from2 {{parent.RL} {parent.RL}}
+  from3 {{parent.RU} {parent.RU}}
+  from4 {{parent.LU} {parent.LU}}
+  name CornerPin2D1
+  xpos 407
+  ypos -179
+ }
+set N194dafb0 [stack 0]
+ Dot {
+  name Dot2
+  xpos 218
+  ypos -176
+ }
+set N194ea200 [stack 0]
+ Dot {
+  name Dot1
+  xpos -123
+  ypos -176
+ }
+ Blur {
+  channels rgb
+  size {0 {parent.lblur}}
+  name Blur1
+  xpos -156
+  ypos -120
+ }
+ Crop {
+  box {{parent.CornerPin2D1.to1.x-1} {parent.CornerPin2D1.to1.y-1} {parent.CornerPin2D1.to1.x} {parent.CornerPin2D1.to3.y+1}}
+  crop false
+  name Crop2
+  xpos -156
+  ypos -74
+ }
+push $N194bfa10
+ Dot {
+  name Dot7
+  xpos 314
+  ypos -38
+ }
+ Merge2 {
+  inputs 2
+  bbox B
+  name Merge2
+  xpos -156
+  ypos -42
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos -156
+  ypos 111
+  disable {{!parent.enableRight}}
+ }
+push $N194bfa10
+push $N194ea200
+ Blur {
+  channels rgb
+  size {0 {parent.rblur}}
+  name Blur2
+  xpos 184
+  ypos -138
+ }
+ Crop {
+  box {{parent.CornerPin2D1.to2.x} {parent.CornerPin2D1.to1.y-1} {parent.CornerPin2D1.to2.x+1} {parent.CornerPin2D1.to3.y+1}}
+  crop false
+  name Crop3
+  xpos 184
+  ypos -106
+ }
+push $N194bfa10
+ Dot {
+  name Dot5
+  xpos 442
+  ypos 26
+ }
+set N1d3bb010 [stack 0]
+ Merge2 {
+  inputs 2
+  bbox B
+  name Merge3
+  xpos 184
+  ypos -10
+ }
+ Switch {
+  inputs 2
+  which {{!parent.enableRight}}
+  name Enable_Right
+  xpos 313
+  ypos 86
+ }
+ Merge2 {
+  inputs 2
+  operation matte
+  bbox B
+  name Merge1
+  xpos 184
+  ypos 118
+  disable {{!parent.enableLeft}}
+ }
+ Shuffle {
+  alpha white
+  name Shuffle1
+  xpos 184
+  ypos 150
+ }
+ Dot {
+  name Dot12
+  xpos 218
+  ypos 186
+ }
+push $N194bfa10
+ Ramp {
+  p0 {{parent.CornerPin2D1.to1.x} {parent.CornerPin2D1.to1.y}}
+  p1 {{parent.CornerPin2D1.to1.x} {parent.CornerPin2D1.to3.y}}
+  name Ramp2
+  xpos 720
+  ypos -74
+ }
+ Dot {
+  name Dot10
+  xpos 753
+  ypos 26
+ }
+push $N194dafb0
+ Dot {
+  name Dot3
+  xpos 651
+  ypos -176
+ }
+set N1d3f99b0 [stack 0]
+ Blur {
+  channels rgb
+  size {{parent.ublur} 0}
+  name Blur3
+  xpos 618
+  ypos -138
+ }
+ Crop {
+  box {{parent.CornerPin2D1.to1.x-1} {parent.CornerPin2D1.to3.y} {parent.CornerPin2D1.to2.x+1} {parent.CornerPin2D1.to3.y+1}}
+  crop false
+  name Crop4
+  xpos 618
+  ypos -106
+ }
+push $N1d3bb010
+ Merge2 {
+  inputs 2
+  bbox B
+  name Merge4
+  xpos 618
+  ypos 39
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy2
+  xpos 618
+  ypos 95
+  disable {{!parent.enableLower}}
+ }
+push $N194bfa10
+ Dot {
+  name Dot9
+  xpos 538
+  ypos -39
+ }
+set N208289a0 [stack 0]
+ Dot {
+  name Dot13
+  xpos 538
+  ypos 8
+ }
+push $N1d3f99b0
+ Dot {
+  name Dot4
+  xpos 858
+  ypos -176
+ }
+ Blur {
+  channels rgb
+  size {{parent.lowblur} 0}
+  name Blur4
+  xpos 824
+  ypos -138
+ }
+ Crop {
+  box {{parent.CornerPin2D1.to1.x-1} {parent.CornerPin2D1.to1.y-1} {parent.CornerPin2D1.to2.x+1} {parent.CornerPin2D1.to1.y}}
+  crop false
+  name Crop5
+  xpos 825
+  ypos -106
+ }
+push $N208289a0
+ Merge2 {
+  inputs 2
+  bbox B
+  name Merge5
+  xpos 825
+  ypos -42
+ }
+ Switch {
+  inputs 2
+  which {{!parent.enableLower}}
+  name Enable_
+  xpos 824
+  ypos 5
+ }
+ Merge2 {
+  inputs 2
+  operation matte
+  bbox B
+  name Merge6
+  xpos 824
+  ypos 102
+  disable {{!parent.enableUpper}}
+ }
+ Shuffle {
+  alpha white
+  name Shuffle2
+  xpos 824
+  ypos 150
+ }
+ Dot {
+  name Dot11
+  xpos 858
+  ypos 186
+ }
+ Merge2 {
+  inputs 2
+  bbox B
+  mix {{parent.hvratio}}
+  name Merge7
+  xpos 432
+  ypos 182
+ }
+ Crop {
+  box {{parent.CornerPin2D1.to1.x} {parent.CornerPin2D1.to1.y} {parent.CornerPin2D1.to3.x} {parent.CornerPin2D1.to3.y}}
+  softness {{parent.edgeblur}}
+  name Crop1
+  xpos 415
+  ypos 287
+ }
+ CornerPin2D {
+  to1 {{min(from1,from2,from3,from4)} {min(from1,from2,from3,from4)}}
+  to2 {{max(from1,from2,from3,from4)} {min(from1,from2,from3,from4)}}
+  to3 {{max(from1,from2,from3,from4)} {max(from1,from2,from3,from4)}}
+  to4 {{min(from1,from2,from3,from4)} {max(from1,from2,from3,from4)}}
+  invert true
+  from1 {{parent.LL} {parent.LL}}
+  from2 {{parent.RL} {parent.RL}}
+  from3 {{parent.RU} {parent.RU}}
+  from4 {{parent.LU} {parent.LU}}
+  name CornerPin2D3
+  xpos 415
+  ypos 319
+ }
+ Output {
+  name Output1
+  xpos 415
+  ypos 374
+ }
+end_group
