@@ -59,7 +59,7 @@ def transformstoMatrix(mode=0):
                 msg = 'Unsupported node type: ' + node.Class() + '.\n Selected Node must be Transform, CornerPin, Tracker'
                 nuke.message(msg)
             else:
-                raise TypeError, 'Unsupported node type.\n Selected Node must be Transform, CornerPin, Tracker'
+                raise TypeError('Unsupported node type.\n Selected Node must be Transform, CornerPin, Tracker')
             return
         node.knob('selected').setValue(False)
 
