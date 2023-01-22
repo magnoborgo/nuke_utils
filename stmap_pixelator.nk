@@ -1,0 +1,30 @@
+set cut_paste_input [stack 0]
+version 12.2 v11
+push $cut_paste_input
+Expression {
+ temp_name0 divx
+ temp_expr0 width/divisions
+ temp_name1 divy
+ temp_expr1 height/divisions
+ expr0 (ceil((x+0.5)/divisions)*divisions)/width
+ expr1 (ceil((y+0.5)/divisions)*divisions)/height
+ expr2 0
+ name Expression4
+ label "pixelator\n\n"
+ selected true
+ xpos -118
+ ypos 258
+ addUserKnob {20 User}
+ addUserKnob {3 divisions}
+ divisions 30
+}
+push 0
+STMap {
+ inputs 2
+ uv rgb
+ filter impulse
+ name STMap6
+ selected true
+ xpos -118
+ ypos 325
+}

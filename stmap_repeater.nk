@@ -1,0 +1,29 @@
+set cut_paste_input [stack 0]
+version 12.2 v11
+push $cut_paste_input
+Expression {
+ temp_name0 divx
+ temp_expr0 width/divisions
+ temp_name1 divy
+ temp_expr1 height/divisions
+ expr0 "(x % divx)/divx"
+ expr1 "(y % divy)/divy"
+ expr2 0
+ name Expression13
+ label "repeater\n"
+ selected true
+ xpos 470
+ ypos 251
+ addUserKnob {20 User}
+ addUserKnob {3 divisions}
+ divisions 2
+}
+push $cut_paste_input
+STMap {
+ inputs 2
+ uv rgb
+ name STMap8
+ selected true
+ xpos 470
+ ypos 331
+}
