@@ -1,0 +1,2942 @@
+set cut_paste_input [stack 0]
+version 13.2 v6
+push $cut_paste_input
+Group {
+name Patch_Warp_custom1
+tile_color 0x3b6957ff
+selected true
+xpos 113
+ypos 123
+addUserKnob {20 User}
+addUserKnob {3 ref_frame l "Reference Frame" t "stores the reference frame.\n"}
+addUserKnob {22 Set_reference_frame l "Set reference frame" -STARTLINE T "myNode = nuke.thisNode()\nTrackNode = myNode.dependencies()\[0]\nmaxTrakers = 50\n\n#original version https://www.nukepedia.com/gizmos/transform/patch_warp_custom\n#this version is based on https://gist.github.com/Shrinks99/f6fcb0dbc6a38bb14555f4a39644a0ea#file-patch_warp_custom-nk\n#reference frame improvement by Magno Borgo - Boundary VFX\n\n\nfor n in range(1, maxTrakers +1):\n    myNode\['tr' + str(n)].clearAnimated()\n    myNode\['tr' + str(n)].setValue(0, 0)\n    myNode\['tr' + str(n)].setValue(0, 1)\n    myNode\['reference_tr' + str(n)].setExpression('tr'+str(n)+\".x(ref_frame)\",0)\n    myNode\['reference_tr' + str(n)].setExpression('tr'+str(n)+\".y(ref_frame)\",1) \n\nif TrackNode.Class() == 'Tracker4':  \n    myKnob = TrackNode\['tracks']\n\n    XList = \[]\n    for n in range(2, 2000, 31):\n          if myKnob.value(n) == 1:\n                break\n          elif myKnob.value(n) == 0:\n                break\n          XList.append(myKnob.value(n))\n          print((myKnob.value(n)))\n    \n    lengthList = len(XList)          \n    \n    for n in range(1, lengthList+1):\n        myNode\['tr' + str(n)].setExpression(TrackNode.name() + '.tracks.' + str(n) + '.track_x', 0)\n        myNode\['tr' + str(n)].setExpression(TrackNode.name() + '.tracks.' + str(n) + '.track_y', 1)\n    \n    \n    listData = \[]\n    for a in range(1, lengthList+1):\n        DataX = myNode\['reference_tr' + str(a)].value(0)\n        print(DataX)\n        listData.append(DataX)\n\n    with myNode:\n        mySp = nuke.toNode('SplineWarp')\n        cKnob= mySp\['curves']\n        root = cKnob.rootLayer\n    \n    \n        for n in range(0, maxTrakers):\n                print((root\[n].name))\n                root\[n].setVisible(nuke.frame(), False)\n    \n        for n in range(0, lengthList):\n                print((root\[n].name))\n                root\[n].setVisible(nuke.frame(), True)\n    myNode\['label'].setValue('ref_frame' + str(nuke.frame()))\n    myNode\['ref_frame'].setValue(int(nuke.frame()))          \n\nelif TrackNode.Class() == 'Merge2':\n\n    listCP = TrackNode.dependencies()\n    listCP_X = \[]\n    listCP_Y = \[]\n\n    for n in listCP:\n        if n.Class() == 'CornerPin2D':\n            for f in range(1, 5):\n                CP_X = n.name() + '.to' + str(f) + '.x'\n                CP_Y = n.name() + '.to' + str(f) + '.y'\n                listCP_X.append(CP_X)\n                listCP_Y.append(CP_Y)\n        if n.Class() == 'Tracker4': \n            TrKnob = n\['tracks']\n            XList = \[]\n            for h in range(2, 2000, 31):\n                if TrKnob.value(h) == 1:\n                    break\n                elif TrKnob.value(h) == 0:\n                    break\n                XList.append(TrKnob.value(h))\n            LenXList = len(XList)\n            for b in range(1, LenXList + 1):         \n                CP_X = n.name() + '.tracks.' + str(b) + '.track_x'\n                CP_Y = n.name() + '.tracks.' + str(b) + '.track_y'\n                listCP_X.append(CP_X)\n                listCP_Y.append(CP_Y)\n\n    lengthList = len(listCP_X)\n\n    for n in range(1, lengthList+1):\n        myNode\['tr' + str(n)].setExpression(listCP_X\[n-1], 0)\n        myNode\['tr' + str(n)].setExpression(listCP_Y\[n-1], 1)\n\n    with myNode:\n        mySp = nuke.toNode('SplineWarp')\n        cKnob= mySp\['curves']\n        root = cKnob.rootLayer\n    \n    \n        for n in range(0, maxTrakers):\n                print((root\[n].name))\n                root\[n].setVisible(nuke.frame(), False)\n    \n        for n in range(0, lengthList):\n                print((root\[n].name))\n                root\[n].setVisible(nuke.frame(), True)\n    myNode\['label'].setValue('ref_frame' + str(nuke.frame()))      \n\n\nelse:\n    nuke.message('Please use correct nodes!!!')\n\n\n"}
+addUserKnob {7 mix_deformation l "mix deformation"}
+mix_deformation 1
+addUserKnob {6 Classic_warping l "Classic warping" +STARTLINE}
+Classic_warping true
+addUserKnob {6 crop_to_format l "crop to format" +STARTLINE}
+addUserKnob {6 bbox_boundary_curve l "bbox boundary curve" -STARTLINE}
+addUserKnob {26 ""}
+addUserKnob {20 Motion_blur l "Motion blur" n 1}
+addUserKnob {41 disable_1 l "use motion blur" T Switch1.disable}
+addUserKnob {41 scale l value -STARTLINE T VectorBlur1.scale}
+addUserKnob {41 method T VectorBlur1.method}
+addUserKnob {41 disable_2 l "show vectors" -STARTLINE T Switch2.disable}
+addUserKnob {20 endGroup_2 l endGroup n -1}
+addUserKnob {26 ""}
+addUserKnob {20 TrackData n 1}
+TrackData 0
+addUserKnob {12 tr1}
+addUserKnob {12 tr2}
+addUserKnob {12 tr3}
+addUserKnob {12 tr4}
+addUserKnob {12 tr5}
+addUserKnob {12 tr6}
+addUserKnob {12 tr7}
+addUserKnob {12 tr8}
+addUserKnob {12 tr9}
+addUserKnob {12 tr10}
+addUserKnob {12 tr11}
+addUserKnob {12 tr12}
+addUserKnob {12 tr13}
+addUserKnob {12 tr14}
+addUserKnob {12 tr15}
+addUserKnob {12 tr16}
+addUserKnob {12 tr17}
+addUserKnob {12 tr18}
+addUserKnob {12 tr19}
+addUserKnob {12 tr20}
+addUserKnob {12 tr21}
+addUserKnob {12 tr22}
+addUserKnob {12 tr23}
+addUserKnob {12 tr24}
+addUserKnob {12 tr25}
+addUserKnob {12 tr26}
+addUserKnob {12 tr27}
+addUserKnob {12 tr28}
+addUserKnob {12 tr29}
+addUserKnob {12 tr30}
+addUserKnob {12 tr31}
+addUserKnob {12 tr32}
+addUserKnob {12 tr33}
+addUserKnob {12 tr34}
+addUserKnob {12 tr35}
+addUserKnob {12 tr36}
+addUserKnob {12 tr37}
+addUserKnob {12 tr38}
+addUserKnob {12 tr39}
+addUserKnob {12 tr40}
+addUserKnob {12 tr41}
+addUserKnob {12 tr42}
+addUserKnob {12 tr43}
+addUserKnob {12 tr44}
+addUserKnob {12 tr45}
+addUserKnob {12 tr46}
+addUserKnob {12 tr47}
+addUserKnob {12 tr48}
+addUserKnob {12 tr49}
+addUserKnob {12 tr50}
+addUserKnob {20 endGroup n -1}
+addUserKnob {26 ""}
+addUserKnob {20 ReferenceData n 1}
+ReferenceData 0
+addUserKnob {12 reference_tr1}
+addUserKnob {12 reference_tr2}
+addUserKnob {12 reference_tr3}
+addUserKnob {12 reference_tr4}
+addUserKnob {12 reference_tr5}
+addUserKnob {12 reference_tr6}
+addUserKnob {12 reference_tr7}
+addUserKnob {12 reference_tr8}
+addUserKnob {12 reference_tr9}
+addUserKnob {12 reference_tr10}
+addUserKnob {12 reference_tr11}
+addUserKnob {12 reference_tr12}
+addUserKnob {12 reference_tr13}
+addUserKnob {12 reference_tr14}
+addUserKnob {12 reference_tr15}
+addUserKnob {12 reference_tr16}
+addUserKnob {12 reference_tr17}
+addUserKnob {12 reference_tr18}
+addUserKnob {12 reference_tr19}
+addUserKnob {12 reference_tr20}
+addUserKnob {12 reference_tr21}
+addUserKnob {12 reference_tr22}
+addUserKnob {12 reference_tr23}
+addUserKnob {12 reference_tr24}
+addUserKnob {12 reference_tr25}
+addUserKnob {12 reference_tr26}
+addUserKnob {12 reference_tr27}
+addUserKnob {12 reference_tr28}
+addUserKnob {12 reference_tr29}
+addUserKnob {12 reference_tr30}
+addUserKnob {12 reference_tr31}
+addUserKnob {12 reference_tr32}
+addUserKnob {12 reference_tr33}
+addUserKnob {12 reference_tr34}
+addUserKnob {12 reference_tr35}
+addUserKnob {12 reference_tr36}
+addUserKnob {12 reference_tr37}
+addUserKnob {12 reference_tr38}
+addUserKnob {12 reference_tr39}
+addUserKnob {12 reference_tr40}
+addUserKnob {12 reference_tr41}
+addUserKnob {12 reference_tr42}
+addUserKnob {12 reference_tr43}
+addUserKnob {12 reference_tr44}
+addUserKnob {12 reference_tr45}
+addUserKnob {12 reference_tr46}
+addUserKnob {12 reference_tr47}
+addUserKnob {12 reference_tr48}
+addUserKnob {12 reference_tr49}
+addUserKnob {12 reference_tr50}
+addUserKnob {20 endGroup_1 l endGroup n -1}
+addUserKnob {26 ""}
+}
+Input {
+inputs 0
+name tracker
+xpos -134
+ypos 94
+}
+Input {
+inputs 0
+name patch
+xpos 0
+ypos 36
+number 1
+}
+Crop {
+box {0 0 {width} {height}}
+crop false
+name Crop1
+xpos 0
+ypos 88
+}
+SplineWarp3 {
+crop_to_format {{parent.crop_to_format}}
+boundary_bbox {{parent.bbox_boundary_curve}}
+colorOverlay {0 0 0 0}
+curves {{{v x3f99999a}
+  {f 0}
+  {n
+   {layer Root
+    {f 2097664}
+    {t x44800000 x44100000}
+    {a pt1x 0 pt1y 0 pt2x 0 pt2y 0 pt3x 0 pt3y 0 pt4x 0 pt4y 0 ptex00 0 ptex01 0 ptex02 0 ptex03 0 ptex10 0 ptex11 0 ptex12 0 ptex13 0 ptex20 0 ptex21 0 ptex22 0 ptex23 0 ptex30 0 ptex31 0 ptex32 0 ptex33 0 ptof1x 0 ptof1y 0 ptof2x 0 ptof2y 0 ptof3x 0 ptof3y 0 ptof4x 0 ptof4y 0 pterr 0 ptrefset 0 ptmot x40800000 ptref 0 warp
+     {=parent.mix_deformation 1}}
+    {cubiccurve Pin1 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {{=0 x3ea00000}       x3d19a000}
+       {{=parent.tr1.x x4476ac00}
+        {=parent.tr1.y x43b5ae66}}
+       {}}}
+     {t x43d10000 x44470000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin3 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr2.x x44061e1e}
+        {=parent.tr2.y x444f7fff}}
+       {}}}
+     {t x43ff0000 x44458000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin5 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr3.x x441be96a}
+        {=parent.tr3.y x444f34b5}}
+       {}}}
+     {t x44150000 x44458000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin7 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr4.x x443670f1}
+        {=parent.tr4.y x444f9697}}
+       {}}}
+     {t x44310000 x44478000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin9 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr5.x x444df879}
+        {=parent.tr5.y x445212d3}}
+       {}}}
+     {t x44478000 x44494000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin11 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr6.x x44124000}
+        {=parent.tr6.y x446e8000}}
+       {}}}
+     {t x44088000 x445e4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin13 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr7.x x44293334}
+        {=parent.tr7.y x446be667}}
+       {}}}
+     {t x441d8000 x445e4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin15 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr8.x x443d8000}
+        {=parent.tr8.y x44671998}}
+       {}}}
+     {t x4433c000 x445e0000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin17 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr9.x x44549333}
+        {=parent.tr9.y x44678000}}
+       {}}}
+     {t x44474000 x445dc000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin19 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr10.x x446e2667}
+        {=parent.tr10.y x4467c001}}
+       {}}}
+     {t x4463c000 x445e0000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin21 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr11.x x42aa0000}
+        {=parent.tr11.y x44434000}}
+       {}}}
+     {t x42aa0000 x44434000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin23 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr12.x x43140000}
+        {=parent.tr12.y x44440000}}
+       {}}}
+     {t x43140000 x44440000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin25 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr13.x x43510000}
+        {=parent.tr13.y x44440000}}
+       {}}}
+     {t x43510000 x44440000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin27 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr14.x x43880000}
+        {=parent.tr14.y x44440000}}
+       {}}}
+     {t x43880000 x44440000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin29 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr15.x x43a28000}
+        {=parent.tr15.y x44430000}}
+       {}}}
+     {t x43a28000 x44430000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin31 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr16.x x43be0000}
+        {=parent.tr16.y x44428000}}
+       {}}}
+     {t x43be0000 x44428000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin33 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr17.x x43d80000}
+        {=parent.tr17.y x44420000}}
+       {}}}
+     {t x43d80000 x44420000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin35 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr18.x x43f98000}
+        {=parent.tr18.y x44428000}}
+       {}}}
+     {t x43f98000 x44428000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin37 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr19.x x440f8000}
+        {=parent.tr19.y x44434000}}
+       {}}}
+     {t x440f8000 x44434000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin39 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr20.x x441fbfff}
+        {=parent.tr20.y x4440b000}}
+       {}}}
+     {t x44224000 x44438000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin41 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr21.x x43a9eaaa}
+        {=parent.tr21.y x44462aaa}}
+       {}}}
+     {t x43aac000 x443e4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin43 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr22.x x43c2eaaa}
+        {=parent.tr22.y x4445e000}}
+       {}}}
+     {t x43c00000 x443e6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin45 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr23.x x43d5d556}
+        {=parent.tr23.y x44449fff}}
+       {}}}
+     {t x43d28000 x443e6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin47 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr24.x x43e72aac}
+        {=parent.tr24.y x4444b556}}
+       {}}}
+     {t x43e30000 x443e4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin49 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr25.x x43f58000}
+        {=parent.tr25.y x44436000}}
+       {}}}
+     {t x43f58000 x443dc000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin51 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr26.x x44051556}
+        {=parent.tr26.y x4443caab}}
+       {}}}
+     {t x44044000 x443d2000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin53 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr27.x x440f9555}
+        {=parent.tr27.y x44422aaa}}
+       {}}}
+     {t x440ec000 x443d6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin55 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr28.x x441a3555}
+        {=parent.tr28.y x4442caab}}
+       {}}}
+     {t x44196000 x443d6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin57 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr29.x x44245555}
+        {=parent.tr29.y x44439556}}
+       {}}}
+     {t x4422e000 x443d2000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin59 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr30.x x442df556}
+        {=parent.tr30.y x44428aab}}
+       {}}}
+     {t x442d2000 x443d2000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin61 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr31.x x44388aaa}
+        {=parent.tr31.y x44434000}}
+       {}}}
+     {t x44378000 x443da000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin63 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr32.x x4440e000}
+        {=parent.tr32.y x44426001}}
+       {}}}
+     {t x4440e000 x443cc000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin65 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr33.x x4448aaab}
+        {=parent.tr33.y x4441f556}}
+       {}}}
+     {t x44484000 x443c2000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin67 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr34.x x44505555}
+        {=parent.tr34.y x4440e000}}
+       {}}}
+     {t x444f8000 x443c8000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin69 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr35.x x4459f555}
+        {=parent.tr35.y x44419556}}
+       {}}}
+     {t x4459c000 x443c6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin71 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr36.x x44671555}
+        {=parent.tr36.y x44415556}}
+       {}}}
+     {t x44664000 x443b8000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin73 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr37.x x44724aab}
+        {=parent.tr37.y x44401555}}
+       {}}}
+     {t x44732000 x443ae000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin75 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr38.x x447e2aab}
+        {=parent.tr38.y x443fe000}}
+       {}}}
+     {t x447d2000 x443a4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin77 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr39.x x44830aaa}
+        {=parent.tr39.y x443f1555}}
+       {}}}
+     {t x4482a000 x443a8000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin79 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr40.x x4487a000}
+        {=parent.tr40.y x44404aaa}}
+       {}}}
+     {t x44875000 x443a4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin81 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr41.x x448c7000}
+        {=parent.tr41.y x443fdfff}}
+       {}}}
+     {t x448c2000 x443a4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin83 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr42.x x44915000}
+        {=parent.tr42.y x443fd555}}
+       {}}}
+     {t x4490b000 x443aa000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin85 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr43.x x44967000}
+        {=parent.tr43.y x443f8000}}
+       {}}}
+     {t x4495d000 x443a8000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin87 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr44.x x449c4556}
+        {=parent.tr44.y x44403fff}}
+       {}}}
+     {t x449b2000 x443aa000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin89 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr45.x x449f8000}
+        {=parent.tr45.y x443f7555}}
+       {}}}
+     {t x449f3000 x443a4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin91 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr46.x x44a43000}
+        {=parent.tr46.y x443eaaab}}
+       {}}}
+     {t x44a39000 x4439e000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin93 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr47.x x44a8a000}
+        {=parent.tr47.y x44404aaa}}
+       {}}}
+     {t x44a80000 x4439a000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin95 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr48.x x44ac6555}
+        {=parent.tr48.y x44402000}}
+       {}}}
+     {t x44ab9000 x4439e000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin97 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr49.x x44b0caaa}
+        {=parent.tr49.y x44402000}}
+       {}}}
+     {t x44b01000 x4439e000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin99 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.tr50.x x44b61555}
+        {=parent.tr50.y x443f8000}}
+       {}}}
+     {t x44b59000 x4439e000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin2 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr1.x x43d10000}
+        {=parent.reference_tr1.y x44470000}}
+       {}}}
+     {t x43d10000 x44470000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin4 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr2.x x43ff0000}
+        {=parent.reference_tr2.y x44458000}}
+       {}}}
+     {t x43ff0000 x44458000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin6 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr3.x x44150000}
+        {=parent.reference_tr3.y x44458000}}
+       {}}}
+     {t x44150000 x44458000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin8 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr4.x x44310000}
+        {=parent.reference_tr4.y x44478000}}
+       {}}}
+     {t x44310000 x44478000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin10 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr5.x x44478000}
+        {=parent.reference_tr5.y x44494000}}
+       {}}}
+     {t x44478000 x44494000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x420c0000 ltm x420c0000 pt 0 ab 1}}
+    {cubiccurve Pin12 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr6.x x44088000}
+        {=parent.reference_tr6.y x445e4000}}
+       {}}}
+     {t x44088000 x445e4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin14 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr7.x x441d8000}
+        {=parent.reference_tr7.y x445e4000}}
+       {}}}
+     {t x441d8000 x445e4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin16 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr8.x x4433c000}
+        {=parent.reference_tr8.y x445e0000}}
+       {}}}
+     {t x4433c000 x445e0000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin18 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr9.x x44474000}
+        {=parent.reference_tr9.y x445dc000}}
+       {}}}
+     {t x44474000 x445dc000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin20 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr10.x x4463c000}
+        {=parent.reference_tr10.y x445e0000}}
+       {}}}
+     {t x4463c000 x445e0000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin22 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr11.x x42bc60de}
+        {=parent.reference_tr11.y x444b7e45}}
+       {}}}
+     {t x42aa0000 x44434000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin24 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr12.x x43220dd6}
+        {=parent.reference_tr12.y x444ae453}}
+       {}}}
+     {t x43140000 x44440000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin26 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr13.x x435d6eb4}
+        {=parent.reference_tr13.y x4448759f}}
+       {}}}
+     {t x43510000 x44440000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin28 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr14.x x438d4530}
+        {=parent.reference_tr14.y x44486452}}
+       {}}}
+     {t x43880000 x44440000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin30 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr15.x x43a941bb}
+        {=parent.reference_tr15.y x44463e45}}
+       {}}}
+     {t x43a28000 x44430000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin32 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr16.x x43c3acf9}
+        {=parent.reference_tr16.y x44450000}}
+       {}}}
+     {t x43be0000 x44428000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin34 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr17.x x43dfd67c}
+        {=parent.reference_tr17.y x44453e45}}
+       {}}}
+     {t x43d80000 x44420000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin36 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr18.x x43fe5d69}
+        {=parent.reference_tr18.y x4445be45}}
+       {}}}
+     {t x43f98000 x44428000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin38 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr19.x x44138dd6}
+        {=parent.reference_tr19.y x44481d67}}
+       {}}}
+     {t x440f8000 x44434000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin40 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr20.x x44253556}
+        {=parent.reference_tr20.y x44464aab}}
+       {}}}
+     {t x44224000 x44438000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 ltn x42140000 ltm x42140000 pt 0 ab 1}}
+    {cubiccurve Pin42 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr21.x x43aac000}
+        {=parent.reference_tr21.y x443e4000}}
+       {}}}
+     {t x43aac000 x443e4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin44 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr22.x x43c00000}
+        {=parent.reference_tr22.y x443e6000}}
+       {}}}
+     {t x43c00000 x443e6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin46 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr23.x x43d28000}
+        {=parent.reference_tr23.y x443e6000}}
+       {}}}
+     {t x43d28000 x443e6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin48 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr24.x x43e30000}
+        {=parent.reference_tr24.y x443e4000}}
+       {}}}
+     {t x43e30000 x443e4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin50 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr25.x x43f58000}
+        {=parent.reference_tr25.y x443dc000}}
+       {}}}
+     {t x43f58000 x443dc000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin52 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr26.x x44044000}
+        {=parent.reference_tr26.y x443d2000}}
+       {}}}
+     {t x44044000 x443d2000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin54 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr27.x x440ec000}
+        {=parent.reference_tr27.y x443d6000}}
+       {}}}
+     {t x440ec000 x443d6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin56 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr28.x x44196000}
+        {=parent.reference_tr28.y x443d6000}}
+       {}}}
+     {t x44196000 x443d6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin58 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr29.x x4422e000}
+        {=parent.reference_tr29.y x443d2000}}
+       {}}}
+     {t x4422e000 x443d2000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin60 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr30.x x442d2000}
+        {=parent.reference_tr30.y x443d2000}}
+       {}}}
+     {t x442d2000 x443d2000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin62 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr31.x x44378000}
+        {=parent.reference_tr31.y x443da000}}
+       {}}}
+     {t x44378000 x443da000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin64 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr32.x x4440e000}
+        {=parent.reference_tr32.y x443cc000}}
+       {}}}
+     {t x4440e000 x443cc000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin66 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr33.x x44484000}
+        {=parent.reference_tr33.y x443c2000}}
+       {}}}
+     {t x44484000 x443c2000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin68 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr34.x x444f8000}
+        {=parent.reference_tr34.y x443c8000}}
+       {}}}
+     {t x444f8000 x443c8000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin70 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr35.x x4459c000}
+        {=parent.reference_tr35.y x443c6000}}
+       {}}}
+     {t x4459c000 x443c6000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin72 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr36.x x44664000}
+        {=parent.reference_tr36.y x443b8000}}
+       {}}}
+     {t x44664000 x443b8000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin74 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr37.x x44732000}
+        {=parent.reference_tr37.y x443ae000}}
+       {}}}
+     {t x44732000 x443ae000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin76 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr38.x x447d2000}
+        {=parent.reference_tr38.y x443a4000}}
+       {}}}
+     {t x447d2000 x443a4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin78 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr39.x x4482a000}
+        {=parent.reference_tr39.y x443a8000}}
+       {}}}
+     {t x4482a000 x443a8000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin80 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr40.x x44875000}
+        {=parent.reference_tr40.y x443a4000}}
+       {}}}
+     {t x44875000 x443a4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin82 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr41.x x448c2000}
+        {=parent.reference_tr41.y x443a4000}}
+       {}}}
+     {t x448c2000 x443a4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin84 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr42.x x4490b000}
+        {=parent.reference_tr42.y x443aa000}}
+       {}}}
+     {t x4490b000 x443aa000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin86 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr43.x x4495d000}
+        {=parent.reference_tr43.y x443a8000}}
+       {}}}
+     {t x4495d000 x443a8000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin88 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr44.x x449b2000}
+        {=parent.reference_tr44.y x443aa000}}
+       {}}}
+     {t x449b2000 x443aa000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin90 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr45.x x449f3000}
+        {=parent.reference_tr45.y x443a4000}}
+       {}}}
+     {t x449f3000 x443a4000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin92 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr46.x x44a39000}
+        {=parent.reference_tr46.y x4439e000}}
+       {}}}
+     {t x44a39000 x4439e000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin94 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr47.x x44a80000}
+        {=parent.reference_tr47.y x4439a000}}
+       {}}}
+     {t x44a80000 x4439a000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin96 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr48.x x44ab9000}
+        {=parent.reference_tr48.y x4439e000}}
+       {}}}
+     {t x44ab9000 x4439e000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin98 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr49.x x44b01000}
+        {=parent.reference_tr49.y x4439e000}}
+       {}}}
+     {t x44b01000 x4439e000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}
+    {cubiccurve Pin100 262656 bezier
+     {cc
+      {f 8224}
+      {p
+       {}
+       {{=parent.reference_tr50.x x44b59000}
+        {=parent.reference_tr50.y x4439e000}}
+       {}}}
+     {t x44b59000 x4439e000}
+     {a ro 0 go 0 bo 0 ao 0 mbo 0 mb 1 mbs x3f000000 mbsot 0 mbso 0 fo 1 fx 0 fy 0 ff 1 ft 0 osw x41200000 osf 0 str 1 pt 0 ab 1}}}}
+  {edge Pin2 Pin1
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin4 Pin3
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin6 Pin5
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin8 Pin7
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin10 Pin9
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin12 Pin11
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin14 Pin13
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin16 Pin15
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin18 Pin17
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin20 Pin19
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin22 Pin21
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin24 Pin23
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin26 Pin25
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin28 Pin27
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin30 Pin29
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin32 Pin31
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin34 Pin33
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin36 Pin35
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin38 Pin37
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin40 Pin39
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin42 Pin41
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin44 Pin43
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin46 Pin45
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin48 Pin47
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin50 Pin49
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin52 Pin51
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin54 Pin53
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin56 Pin55
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin58 Pin57
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin60 Pin59
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin62 Pin61
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin64 Pin63
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin66 Pin65
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin68 Pin67
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin70 Pin69
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin72 Pin71
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin74 Pin73
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin76 Pin75
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin78 Pin77
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin80 Pin79
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin82 Pin81
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin84 Pin83
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin86 Pin85
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin88 Pin87
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin90 Pin89
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin92 Pin91
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin94 Pin93
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin96 Pin95
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin98 Pin97
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}
+  {edge Pin100 Pin99
+   {cp 0 0 0 0 0
+    {{x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}
+     {x3f000000 x3f000000}}   cache
+    {{xff7fffff 0 0}
+     {xff7fffff x3eaaaaab x3eaaaaab}
+     {xff7fffff x3f2aaaab x3f2aaaab}
+     {xff7fffff 1 1}}}
+   {a vis 0}}}}
+toolbar_autokey false
+toolbar_label_points true
+toolbar_preview_mode "persistent preview"
+rbf {{parent.Classic_warping}}
+filter Mitchell
+name SplineWarp
+xpos 0
+ypos 151
+cached true
+}
+set Na1424740 [stack 0]
+Dot {
+name Dot2
+xpos -85
+ypos 161
+}
+Dot {
+name Dot3
+xpos -85
+ypos 368
+}
+Group {
+inputs 0
+name MB
+selected true
+xpos 145
+ypos 61
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T50.translate.x(frame +1) - T50.translate.x"} {"T50.translate.y(frame +1) - T50.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant50
+xpos 5460
+ypos 38
+postage_stamp false
+}
+Crop {
+box {10 10 40 40}
+name Crop2
+xpos 5460
+ypos 62
+}
+set Cc0b8fda0 [stack 0]
+Transform {
+translate {{parent.parent.tr50.x-25} {parent.parent.tr50.y-25}}
+center {25 25}
+name T50
+xpos 5460
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T49.translate.x(frame +1) - T49.translate.x"} {"T49.translate.y(frame +1) - T49.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant49
+xpos 5350
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 5350
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr49.x-25} {parent.parent.tr49.y-25}}
+center {25 25}
+name T49
+xpos 5350
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T48.translate.x(frame +1) - T48.translate.x"} {"T48.translate.y(frame +1) - T48.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant48
+xpos 5240
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 5240
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr48.x-25} {parent.parent.tr48.y-25}}
+center {25 25}
+name T48
+xpos 5240
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T47.translate.x(frame +1) - T47.translate.x"} {"T47.translate.y(frame +1) - T47.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant47
+xpos 5130
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 5130
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr47.x-25} {parent.parent.tr47.y-25}}
+center {25 25}
+name T47
+xpos 5130
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T46.translate.x(frame +1) - T46.translate.x"} {"T46.translate.y(frame +1) - T46.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant46
+xpos 5020
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 5020
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr46.x-25} {parent.parent.tr46.y-25}}
+center {25 25}
+name T46
+xpos 5020
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T45.translate.x(frame +1) - T45.translate.x"} {"T45.translate.y(frame +1) - T45.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant45
+xpos 4910
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 4910
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr45.x-25} {parent.parent.tr45.y-25}}
+center {25 25}
+name T45
+xpos 4910
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T44.translate.x(frame +1) - T44.translate.x"} {"T44.translate.y(frame +1) - T44.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant44
+xpos 4800
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 4800
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr44.x-25} {parent.parent.tr44.y-25}}
+center {25 25}
+name T44
+xpos 4800
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T43.translate.x(frame +1) - T43.translate.x"} {"T43.translate.y(frame +1) - T43.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant43
+xpos 4690
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 4690
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr43.x-25} {parent.parent.tr43.y-25}}
+center {25 25}
+name T43
+xpos 4690
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T42.translate.x(frame +1) - T42.translate.x"} {"T42.translate.y(frame +1) - T42.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant42
+xpos 4580
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 4580
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr42.x-25} {parent.parent.tr42.y-25}}
+center {25 25}
+name T42
+xpos 4580
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T41.translate.x(frame +1) - T41.translate.x"} {"T41.translate.y(frame +1) - T41.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant41
+xpos 4470
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 4470
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr41.x-25} {parent.parent.tr41.y-25}}
+center {25 25}
+name T41
+xpos 4470
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T40.translate.x(frame +1) - T40.translate.x"} {"T40.translate.y(frame +1) - T40.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant40
+xpos 4360
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 4360
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr40.x-25} {parent.parent.tr40.y-25}}
+center {25 25}
+name T40
+xpos 4360
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T39.translate.x(frame +1) - T39.translate.x"} {"T39.translate.y(frame +1) - T39.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant39
+xpos 4250
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 4250
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr39.x-25} {parent.parent.tr39.y-25}}
+center {25 25}
+name T39
+xpos 4250
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T38.translate.x(frame +1) - T38.translate.x"} {"T38.translate.y(frame +1) - T38.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant38
+xpos 4140
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 4140
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr38.x-25} {parent.parent.tr38.y-25}}
+center {25 25}
+name T38
+xpos 4140
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T37.translate.x(frame +1) - T37.translate.x"} {"T37.translate.y(frame +1) - T37.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant37
+xpos 4030
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 4030
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr37.x-25} {parent.parent.tr37.y-25}}
+center {25 25}
+name T37
+xpos 4030
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T36.translate.x(frame +1) - T36.translate.x"} {"T36.translate.y(frame +1) - T36.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant36
+xpos 3920
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 3920
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr36.x-25} {parent.parent.tr36.y-25}}
+center {25 25}
+name T36
+xpos 3920
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T35.translate.x(frame +1) - T35.translate.x"} {"T35.translate.y(frame +1) - T35.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant35
+xpos 3810
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 3810
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr35.x-25} {parent.parent.tr35.y-25}}
+center {25 25}
+name T35
+xpos 3810
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T34.translate.x(frame +1) - T34.translate.x"} {"T34.translate.y(frame +1) - T34.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant34
+xpos 3700
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 3700
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr34.x-25} {parent.parent.tr34.y-25}}
+center {25 25}
+name T34
+xpos 3700
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T33.translate.x(frame +1) - T33.translate.x"} {"T33.translate.y(frame +1) - T33.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant33
+xpos 3590
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 3590
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr33.x-25} {parent.parent.tr33.y-25}}
+center {25 25}
+name T33
+xpos 3590
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T32.translate.x(frame +1) - T32.translate.x"} {"T32.translate.y(frame +1) - T32.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant32
+xpos 3480
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 3480
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr32.x-25} {parent.parent.tr32.y-25}}
+center {25 25}
+name T32
+xpos 3480
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T31.translate.x(frame +1) - T31.translate.x"} {"T31.translate.y(frame +1) - T31.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant31
+xpos 3370
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 3370
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr31.x-25} {parent.parent.tr31.y-25}}
+center {25 25}
+name T31
+xpos 3370
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T30.translate.x(frame +1) - T30.translate.x"} {"T30.translate.y(frame +1) - T30.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant30
+xpos 3260
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 3260
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr30.x-25} {parent.parent.tr30.y-25}}
+center {25 25}
+name T30
+xpos 3260
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T29.translate.x(frame +1) - T29.translate.x"} {"T29.translate.y(frame +1) - T29.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant29
+xpos 3150
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 3150
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr29.x-25} {parent.parent.tr29.y-25}}
+center {25 25}
+name T29
+xpos 3150
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T28.translate.x(frame +1) - T28.translate.x"} {"T28.translate.y(frame +1) - T28.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant28
+xpos 3040
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 3040
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr28.x-25} {parent.parent.tr28.y-25}}
+center {25 25}
+name T28
+xpos 3040
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T27.translate.x(frame +1) - T27.translate.x"} {"T27.translate.y(frame +1) - T27.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant27
+xpos 2930
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 2930
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr27.x-25} {parent.parent.tr27.y-25}}
+center {25 25}
+name T27
+xpos 2930
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T26.translate.x(frame +1) - T26.translate.x"} {"T26.translate.y(frame +1) - T26.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant26
+xpos 2820
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 2820
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr26.x-25} {parent.parent.tr26.y-25}}
+center {25 25}
+name T26
+xpos 2820
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T25.translate.x(frame +1) - T25.translate.x"} {"T25.translate.y(frame +1) - T25.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant25
+xpos 2710
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 2710
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr25.x-25} {parent.parent.tr25.y-25}}
+center {25 25}
+name T25
+xpos 2710
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T24.translate.x(frame +1) - T24.translate.x"} {"T24.translate.y(frame +1) - T24.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant24
+xpos 2600
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 2600
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr24.x-25} {parent.parent.tr24.y-25}}
+center {25 25}
+name T24
+xpos 2600
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T23.translate.x(frame +1) - T23.translate.x"} {"T23.translate.y(frame +1) - T23.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant23
+xpos 2490
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 2490
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr23.x-25} {parent.parent.tr23.y-25}}
+center {25 25}
+name T23
+xpos 2490
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T22.translate.x(frame +1) - T22.translate.x"} {"T22.translate.y(frame +1) - T22.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant22
+xpos 2380
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 2380
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr22.x-25} {parent.parent.tr22.y-25}}
+center {25 25}
+name T22
+xpos 2380
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T21.translate.x(frame +1) - T21.translate.x"} {"T21.translate.y(frame +1) - T21.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant21
+xpos 2270
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 2270
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr21.x-25} {parent.parent.tr21.y-25}}
+center {25 25}
+name T21
+xpos 2270
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T20.translate.x(frame +1) - T20.translate.x"} {"T20.translate.y(frame +1) - T20.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant20
+xpos 2160
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 2160
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr20.x-25} {parent.parent.tr20.y-25}}
+center {25 25}
+name T20
+xpos 2160
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T19.translate.x(frame +1) - T19.translate.x"} {"T19.translate.y(frame +1) - T19.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant19
+xpos 2050
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 2050
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr19.x-25} {parent.parent.tr19.y-25}}
+center {25 25}
+name T19
+xpos 2050
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T18.translate.x(frame +1) - T18.translate.x"} {"T18.translate.y(frame +1) - T18.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant18
+xpos 1940
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 1940
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr18.x-25} {parent.parent.tr18.y-25}}
+center {25 25}
+name T18
+xpos 1940
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T17.translate.x(frame +1) - T17.translate.x"} {"T17.translate.y(frame +1) - T17.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant17
+xpos 1830
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 1830
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr17.x-25} {parent.parent.tr17.y-25}}
+center {25 25}
+name T17
+xpos 1830
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T16.translate.x(frame +1) - T16.translate.x"} {"T16.translate.y(frame +1) - T16.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant16
+xpos 1720
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 1720
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr16.x-25} {parent.parent.tr16.y-25}}
+center {25 25}
+name T16
+xpos 1720
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T15.translate.x(frame +1) - T15.translate.x"} {"T15.translate.y(frame +1) - T15.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant15
+xpos 1610
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 1610
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr15.x-25} {parent.parent.tr15.y-25}}
+center {25 25}
+name T15
+xpos 1610
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T14.translate.x(frame +1) - T14.translate.x"} {"T14.translate.y(frame +1) - T14.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant14
+xpos 1500
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 1500
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr14.x-25} {parent.parent.tr14.y-25}}
+center {25 25}
+name T14
+xpos 1500
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T13.translate.x(frame +1) - T13.translate.x"} {"T13.translate.y(frame +1) - T13.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant13
+xpos 1390
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 1390
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr13.x-25} {parent.parent.tr13.y-25}}
+center {25 25}
+name T13
+xpos 1390
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T12.translate.x(frame +1) - T12.translate.x"} {"T12.translate.y(frame +1) - T12.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant12
+xpos 1280
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 1280
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr12.x-25} {parent.parent.tr12.y-25}}
+center {25 25}
+name T12
+xpos 1280
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T11.translate.x(frame +1) - T11.translate.x"} {"T11.translate.y(frame +1) - T11.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant11
+xpos 1170
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 1170
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr11.x-25} {parent.parent.tr11.y-25}}
+center {25 25}
+name T11
+xpos 1170
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T10.translate.x(frame +1) - T10.translate.x"} {"T10.translate.y(frame +1) - T10.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant10
+xpos 1060
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 1060
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr10.x-25} {parent.parent.tr10.y-25}}
+center {25 25}
+name T10
+xpos 1060
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T9.translate.x(frame +1) - T9.translate.x"} {"T9.translate.y(frame +1) - T9.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant9
+xpos 950
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 950
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr9.x-25} {parent.parent.tr9.y-25}}
+center {25 25}
+name T9
+xpos 950
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T8.translate.x(frame +1) - T8.translate.x"} {"T8.translate.y(frame +1) - T8.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant8
+xpos 840
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 840
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr8.x-25} {parent.parent.tr8.y-25}}
+center {25 25}
+name T8
+xpos 840
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T7.translate.x(frame +1) - T7.translate.x"} {"T7.translate.y(frame +1) - T7.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant7
+xpos 730
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 730
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr7.x-25} {parent.parent.tr7.y-25}}
+center {25 25}
+name T7
+xpos 730
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T6.translate.x(frame +1) - T6.translate.x"} {"T6.translate.y(frame +1) - T6.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant6
+xpos 620
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 620
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr6.x-25} {parent.parent.tr6.y-25}}
+center {25 25}
+name T6
+xpos 620
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T5.translate.x(frame +1) - T5.translate.x"} {"T5.translate.y(frame +1) - T5.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant5
+xpos 510
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 510
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr5.x-25} {parent.parent.tr5.y-25}}
+center {25 25}
+name T5
+xpos 510
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T4.translate.x(frame +1) - T4.translate.x"} {"T4.translate.y(frame +1) - T4.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant4
+xpos 400
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 400
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr4.x-25} {parent.parent.tr4.y-25}}
+center {25 25}
+name T4
+xpos 400
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T3.translate.x(frame +1) - T3.translate.x"} {"T3.translate.y(frame +1) - T3.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant3
+xpos 290
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 290
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr3.x-25} {parent.parent.tr3.y-25}}
+center {25 25}
+name T3
+xpos 290
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+color {{"T2.translate.x(frame +1) - T2.translate.x"} {"T2.translate.y(frame +1) - T2.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant2
+xpos 180
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 180
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr2.x-25} {parent.parent.tr2.y-25}}
+center {25 25}
+name T2
+xpos 180
+ypos 158
+}
+push 0
+Constant {
+inputs 0
+channels rgb
+color {{"T1.translate.x(frame +1) - T1.translate.x"} {"T1.translate.y(frame +1) - T1.translate.y"} 0 0}
+format "50 50 0 0 50 50 1 n"
+name Constant1
+xpos 70
+ypos 38
+postage_stamp false
+}
+clone $Cc0b8fda0 {
+xpos 70
+ypos 62
+selected false
+}
+Transform {
+translate {{parent.parent.tr1.x-25} {parent.parent.tr1.y-25}}
+center {25 25}
+name T1
+xpos 70
+ypos 158
+}
+Constant {
+inputs 0
+channels rgb
+name Constant_main
+xpos -150
+ypos 495
+}
+Merge2 {
+inputs 51+1
+name Merge1
+xpos -40
+ypos 518
+}
+Blur {
+channels rgb
+size 100
+filter box
+name Blur1
+xpos -40
+ypos 590
+}
+Crop {
+box {0 0 {width} {height}}
+name Crop1
+xpos -40
+ypos 638
+}
+Output {
+name Output1
+xpos -40
+ypos 686
+}
+Input {
+inputs 0
+name Input1
+xpos -148
+ypos 430
+}
+end_group
+Dot {
+name Dot1
+xpos 179
+ypos 233
+}
+set Nc0ec4a70 [stack 0]
+push $Na1424740
+Copy {
+inputs 2
+from0 rgba.red
+to0 forward.u
+from1 rgba.green
+to1 forward.v
+name Copy2
+xpos 0
+ypos 217
+}
+VectorBlur {
+uv forward
+name VectorBlur1
+xpos 0
+ypos 280
+}
+Switch {
+inputs 2
+which 1
+name Switch1
+xpos 0
+ypos 364
+}
+push $Nc0ec4a70
+Shuffle {
+alpha white
+name Shuffle1
+xpos 145
+ypos 358
+}
+Dot {
+name Dot4
+xpos 179
+ypos 444
+}
+Switch {
+inputs 2
+which 1
+name Switch2
+xpos 0
+ypos 440
+}
+Output {
+name Output1
+xpos 0
+ypos 494
+}
+end_group
