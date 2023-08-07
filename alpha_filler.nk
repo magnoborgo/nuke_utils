@@ -1,0 +1,25 @@
+set cut_paste_input [stack 0]
+version 12.2 v11
+push $cut_paste_input
+Premult {
+ name Premult1
+ selected true
+ xpos -559
+ ypos 2969
+}
+Blur {
+ channels rgba
+ size 100
+ maskChannelInput rgba.alpha
+ invert_mask true
+ name Blur3
+ selected true
+ xpos -559
+ ypos 3016
+}
+Unpremult {
+ name Unpremult1
+ selected true
+ xpos -559
+ ypos 3086
+}
