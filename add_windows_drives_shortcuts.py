@@ -3,11 +3,11 @@ import string
 import os
 
 def add_windows_drives_shortcuts():
-    """ add all windows hard disks with disk names to the preferences 
+    """ add all windows hard disks with disk names to the file preferences 
         only works if added on menu.py
-        it needs a unique character sequences to recognize the dynamically created drives ("divisor")
+        it needs a unique character sequences to recognize the dynamically created drives ("UNIQUE")
         tested on win11
-        
+
 
     """
     EXCLUSIONLIST = ["CACHE","ANYDISKNAMEYOUWANT"]
