@@ -14,6 +14,12 @@ __web__ = "www.boundaryvfx.com"
 BVFX_DEFAULT_SHORTCUT = ""
 BVFX_DEFAULT_MENULABEL = "Curve Tool to Grade"
 
+'''simple example menu.py:
+import bvfx_curvetool2grade
+toolbar = nuke.menu("Nodes")
+bvfxt = toolbar.addMenu("BoundaryVFX Tools")
+bvfxt.addCommand('CurveTool2Grade', 'bvfx_curvetool2grade.main()')
+'''
 
 def main():
     ''' Copy CurveTool intensity Data to a Grade Node
