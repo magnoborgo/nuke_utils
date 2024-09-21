@@ -1,30 +1,58 @@
 set cut_paste_input [stack 0]
-version 12.2 v11
+version 12.0 v4
 push $cut_paste_input
+Group {
+name Stmap_Pixelator
+selected true
+xpos 37
+ypos 998
+addUserKnob {20 User}
+addUserKnob {3 divisions l Divisions}
+divisions 30
+addUserKnob {26 "" +STARTLINE}
+addUserKnob {26 _1 l "" +STARTLINE T "<span style=\"color:#aaa;font-family:sans-serif;font-size:8pt\">Stmap pixelator v1.0 <br>by <a href=\"https://github.com/magnoborgo/\" style=\"color:#aaa\">Magno Borgo</a>\nBoundary Visual Effects</span>"}
+}
+Input {
+inputs 0
+name Input1
+xpos 12
+ypos 430
+}
+Dot {
+name Dot4
+note_font_size 30
+xpos 46
+ypos 470
+}
+set Nd81d3600 [stack 0]
 Expression {
- temp_name0 divx
- temp_expr0 width/divisions
- temp_name1 divy
- temp_expr1 height/divisions
- expr0 (ceil((x+0.5)/divisions)*divisions)/width
- expr1 (ceil((y+0.5)/divisions)*divisions)/height
- expr2 0
- name Expression4
- label "pixelator\n\n"
- selected true
- xpos -118
- ypos 258
- addUserKnob {20 User}
- addUserKnob {3 divisions}
- divisions 30
+temp_name0 divx
+temp_expr0 width/divisions
+temp_name1 divy
+temp_expr1 height/divisions
+expr0 ((ceil((x+0.5)/divisions)*divisions)-(divisions/2))/width
+expr1 ((ceil((y+0.5)/divisions)*divisions)-(divisions/2))/height
+expr2 0
+name Expression3
+label "pixelator\n\n"
+xpos 111
+ypos 463
+addUserKnob {20 User}
+addUserKnob {3 divisions}
+divisions {{parent.divisions}}
 }
-push 0
+push $Nd81d3600
 STMap {
- inputs 2
- uv rgb
- filter impulse
- name STMap6
- selected true
- xpos -118
- ypos 325
+inputs 2
+uv rgb
+filter impulse
+name STMap3
+xpos 111
+ypos 523
 }
+Output {
+name Output1
+xpos 111
+ypos 623
+}
+end_group
