@@ -6,6 +6,7 @@
 #Thanks to Ivan Busquets nukepedia article http://www.nukepedia.com/written-tutorials/using-the-nukemath-python-module-to-do-vector-and-matrix-operations/all
 #Cornerpin to matrix adapted from Pete O'Connell code.http://community.thefoundry.co.uk/discussion/topic.aspx?f=189&t=98563
 
+# User must setup Project settings, script will only run from first to last frame of project settings
 
 import nuke
 import math
