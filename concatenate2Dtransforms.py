@@ -8,6 +8,7 @@
 
 
 import nuke
+import math
 
 def applyTransform(x,y,z,node,tMatrix):
     tMatrix.makeIdentity()
