@@ -1,0 +1,84 @@
+set cut_paste_input [stack 0]
+version 11.1 v4
+push $cut_paste_input
+Dot {
+ name Dot2
+ note_font_size 30
+ selected true
+ xpos 597
+ ypos 433
+}
+set N8af15ee0 [stack 0]
+Dot {
+ name Dot3
+ note_font_size 30
+ selected true
+ xpos 812
+ ypos 433
+}
+Group {
+ name Laplacian1
+ label "level \[value level]"
+ selected true
+ xpos 778
+ ypos 498
+ addUserKnob {20 User}
+ addUserKnob {7 basesize l "base level size" t "level 1 base size" R 0 1000}
+ basesize 3.75
+ addUserKnob {7 level t "pyramid depth" R 0 100}
+ level 1
+ addUserKnob {7 multiplier t "depth multiplier" R 0 1000}
+ multiplier 2
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos 349
+  ypos -155
+ }
+ Blur {
+  channels rgba
+  size {{parent.basesize*multiplier*level}}
+  name Blur1
+  xpos 341
+  ypos -90
+ }
+ Output {
+  name Output1
+  xpos 349
+  ypos -18
+ }
+end_group
+set N9e2a4000 [stack 0]
+Dot {
+ name Dot4
+ note_font_size 30
+ selected true
+ xpos 812
+ ypos 560
+}
+Dot {
+ name Dot5
+ note_font_size 30
+ selected true
+ xpos 812
+ ypos 675
+}
+push $N8af15ee0
+push $N9e2a4000
+Merge2 {
+ inputs 2
+ operation divide
+ name Merge1
+ selected true
+ xpos 563
+ ypos 502
+}
+Merge2 {
+ inputs 2
+ operation multiply
+ name Plus2
+ selected true
+ xpos 563
+ ypos 672
+}
