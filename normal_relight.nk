@@ -1,0 +1,156 @@
+set cut_paste_input [stack 0]
+version 15.1 v5
+push $cut_paste_input
+Group {
+ name nShader
+ selected true
+ xpos 2230
+ ypos -25
+ addUserKnob {20 User}
+ addUserKnob {41 normal_vectors l "Normal Vectors" t "define Normal Pass" T Shuffle1.in}
+ addUserKnob {41 equator_angle l "Equator Angle" t "controls the left to right angle of the light" T Constant2.equator_angle}
+ addUserKnob {41 polar_height l "Polar Height" t "controls the top to bottom angle of the light" T Constant2.polar_height}
+ addUserKnob {41 light_color l "Light Color" t "Color of light" T Grade1.multiply}
+ addUserKnob {41 only_light l "Only Light" t "Enable gives you only light impact and disable gives you compose output." T Merge1.disable}
+}
+ Read {
+  inputs 0
+  file /Users/mb/Downloads/project_file/nshader.gizmo
+  before black
+  after black
+  origset true
+  in_colorspace scene_linear
+  out_colorspace scene_linear
+  name Read1
+  xpos -153
+  ypos 123
+ }
+ Input {
+  inputs 0
+  name Input1
+  xpos -78
+  ypos -228
+ }
+set N2bb30200 [stack 0]
+push 0
+ Constant {
+  inputs 0
+  channels rgb
+  color {{cos(radians(polar_height))*cos(radians(equator_angle))} {-sin(radians(polar_height))} {-sin(radians(equator_angle))*cos(radians(polar_height))} {curve}}
+  name Constant2
+  xpos 66
+  ypos -227
+  addUserKnob {20 User}
+  addUserKnob {7 equator_angle l "Equator Angle" R 0 360}
+  equator_angle 180
+  addUserKnob {7 polar_height l "Polar Height" R -90 90}
+  polar_height 20
+  addUserKnob {26 ""}
+  addUserKnob {41 color_1 l color T Constant2.color}
+ }
+ Crop {
+  box {0 0 {Input1.width} {Input1.height}}
+  reformat true
+  crop false
+  name Crop1
+  xpos 66
+  ypos -143
+ }
+push $N2bb30200
+ Dot {
+  name Dot1
+  xpos -44
+  ypos -190
+ }
+ Shuffle {
+  alpha white
+  name Shuffle1
+  xpos -78
+  ypos -41
+ }
+ Difference {
+  inputs 2
+  name Difference1
+  xpos 66
+  ypos -45
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  alpha black
+  name Shuffle2
+  xpos 66
+  ypos -4
+ }
+ Invert {
+  name Invert1
+  xpos 66
+  ypos 34
+ }
+ Grade {
+  whitepoint 2
+  white_clamp true
+  name Grade1
+  xpos 66
+  ypos 89
+ }
+ Merge2 {
+  inputs 2+1
+  operation plus
+  name Merge1
+  xpos 66
+  ypos 161
+ }
+ Output {
+  name Output1
+  xpos 66
+  ypos 225
+ }
+end_group
+push $cut_paste_input
+Group {
+ name _2D_Relight2
+ selected true
+ xpos 2113
+ ypos -28
+ addUserKnob {20 User l Relight t "Allows you to relight using a normal pass and a simple point position. \nThe light direction is the vector between the two locations. The Z component is set by the distance bewteen them.\n"}
+ addUserKnob {41 light_center l "Light Center" T Expression1.light_center}
+ addUserKnob {41 light_locator l "Light Location" T Expression1.light_locator}
+ addUserKnob {26 Instructions l "" +STARTLINE T "\n\nAllows you to relight using a normal pass and a simple point position. \nThe light direction is the vector between the two locations. The Z component is set by the distance bewteen them. It is only able to do directional lighting.\n\nThe normals are assumed to be in the input rgb channel."}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos 261
+  ypos 114
+ }
+ Expression {
+  temp_name0 x
+  temp_expr0 (light_locator.x/width-light_center.x/width)*4
+  temp_name1 y
+  temp_expr1 (light_locator.y/height-light_center.y/height)*4
+  temp_name2 z
+  temp_expr2 "1-(sqrt((light_locator.x/width-light_center.x/width)*(light_locator.x/width-light_center.x/width) + (light_locator.y/height-light_center.y/height)*(light_locator.y/height-light_center.y/height))/0.25)"
+  temp_name3 norm
+  temp_expr3 sqrt(x*x+y*y+z*z)
+  channel0 rgb
+  expr0 r*(x*1/norm)+g*(y*1/norm)+b*(z*1/norm)
+  channel1 {-rgba.red -rgba.green -rgba.blue none}
+  expr1 x
+  channel2 {-rgba.red -rgba.green -rgba.blue none}
+  name Expression1
+  xpos 261
+  ypos 188
+  addUserKnob {20 User}
+  addUserKnob {12 light_center l "Light Center"}
+  light_center {688 440}
+  addUserKnob {12 light_locator l "Light Location"}
+  light_locator {1398 422}
+ }
+ Output {
+  name Output1
+  xpos 261
+  ypos 254
+ }
+end_group
